@@ -47,7 +47,7 @@ system_prompt = (
 )
 
 # Example dynamic user input (this can come from frontend, CLI, etc.)
-user_prompt = "Build me a responsive login page with React and TailwindCSS."
+user_prompt = "Build me a responsive login and signup page with React and TailwindCSS."
 
 # Combine system + user request (One-shot prompting)
 response = model.generate_content(system_prompt + "\n\nUser Request: " + user_prompt)
