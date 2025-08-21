@@ -1,12 +1,10 @@
 import config
 import google.generativeai as genai
 
+# Configure API key
 genai.configure(api_key=config.GOOGLE_API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
-
-chat = model.start_chat()
-
+# ProDev AI System Prompt
 system_prompt = (
     "You are ProDev AI — a professional full-stack coding assistant. "
     "Your job is to deliver complete, runnable code solutions with clean explanations. "
@@ -20,13 +18,32 @@ system_prompt = (
     "7) Be concise, avoid filler, but never omit critical steps.\n"
 )
 
+# Create model with system prompt
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction=system_prompt
+)
 
-user_prompt = "Plan a 5-day mid-budget trip to Italy in October. We love history and food.We are from India"
+# === Example Dynamic Inputs (You can change these anytime) ===
+language = "Python"
+framework = "FastAPI"
+feature = "build a REST API with CRUD operations for a todo app"
+extras = ["JWT authentication", "SQLite database", "error handling"]
 
-chat = model.start_chat(history=[
-    {"role": "user", "parts": [system_prompt]}  
-])
+# Build dynamic coding task
+user_prompt = f"""
+Write a complete {language} project using {framework}.
+The task: {feature}.
+Include: {", ".join(extras)}.
+Return the code in Markdown with syntax highlighting.
+If multiple files are needed, clearly separate them with filenames.
+"""
 
+# Start chat
+chat = model.start_chat()
 
+# Send message
 response = chat.send_message(user_prompt)
+
+# Print output
 print(response.text)
