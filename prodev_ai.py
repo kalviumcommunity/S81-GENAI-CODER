@@ -7,27 +7,30 @@ genai.configure(api_key=config.GOOGLE_API_KEY)
 # Load model
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# Define system prompt for ProDev AI
-system_prompt = (
-    "You are ProDev AI, a professional full-stack coding assistant.\n"
-    "Your job is to generate complete, runnable code solutions.\n"
-    "Always include:\n"
-    "1) Code (clean & well-commented)\n"
-    "2) A short explanation in Markdown after the code\n"
-    "Respond in valid JSON format with keys: {\"code\": \"...\", \"explanation\": \"...\"}\n"
-    "Do not include comments outside JSON. Keep it concise but professional."
-)
+# ProDev AI user prompt
+user_prompt = """
+You are ProDev AI, a professional full-stack coding assistant.
 
-# Example user request
-user_prompt = "Build a Python script that fetches weather data from an API and prints today's temperature."
+Task: Write a complete, runnable program in Python that fetches weather data from a free API
+and prints today's temperature in Celsius for a given city.
 
-# Start chat with system role
-chat = model.start_chat(history=[
-    {"role": "user", "parts": [system_prompt]}
-])
+Think step by step:
+1. Choose a reliable free API (like OpenWeatherMap).
+2. Show how to make an HTTP request in Python.
+3. Parse the response JSON to extract temperature data.
+4. Handle possible errors (invalid API key, bad city name, etc).
+5. Print today's temperature in a clear format.
 
-# Send user query
+Finally, present the output strictly in this JSON structure:
+{
+  "code": "... full Python code here ...",
+  "explanation": "... short explanation of how it works ..."
+}
+"""
+
+# Start chat
+chat = model.start_chat()
 response = chat.send_message(user_prompt)
 
-# Print output
+# Print model response
 print(response.text)
