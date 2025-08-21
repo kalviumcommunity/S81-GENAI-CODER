@@ -4,38 +4,30 @@ import google.generativeai as genai
 # Configure Gemini
 genai.configure(api_key=config.GOOGLE_API_KEY)
 
-# Load model with generation configs
-model = genai.GenerativeModel(
-    "gemini-1.5-flash",
-    generation_config={
-        "temperature": 0.9,
-        "top_p": 0.9
-    }
+# Load model
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+# Define system prompt for ProDev AI
+system_prompt = (
+    "You are ProDev AI, a professional full-stack coding assistant.\n"
+    "Your job is to generate complete, runnable code solutions.\n"
+    "Always include:\n"
+    "1) Code (clean & well-commented)\n"
+    "2) A short explanation in Markdown after the code\n"
+    "Respond in valid JSON format with keys: {\"code\": \"...\", \"explanation\": \"...\"}\n"
+    "Do not include comments outside JSON. Keep it concise but professional."
 )
 
-# One-shot system prompt for ProDev AI
-SYSTEM_PROMPT = """
-You are ProDev AI — a professional full-stack coding assistant.
-- Always return complete, runnable code.
-- Use clean coding practices with comments.
-- Provide a short explanation in markdown after the code.
-"""
+# Example user request
+user_prompt = "Build a Python script that fetches weather data from an API and prints today's temperature."
 
-def ask_model(prompt):
-    # Combine system + user request
-    response = model.generate_content(SYSTEM_PROMPT + "\n\nUser Request: " + prompt)
+# Start chat with system role
+chat = model.start_chat(history=[
+    {"role": "user", "parts": [system_prompt]}
+])
 
-    print("\nProDev AI Response:\n", response.text)
+# Send user query
+response = chat.send_message(user_prompt)
 
-    if hasattr(response, "usage_metadata"):
-        tokens_in = response.usage_metadata.prompt_token_count
-        tokens_out = response.usage_metadata.candidates_token_count
-        total = response.usage_metadata.total_token_count
-        print(f"\nToken Usage: Input={tokens_in}, Output={tokens_out}, Total={total}\n")
-    else:
-        print("\nToken usage metadata not available in this SDK.\n")
-
-    return response
-
-# Example query
-ask_model("Build a simple React counter app with increment and decrement buttons.")
+# Print output
+print(response.text)
