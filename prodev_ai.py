@@ -4,52 +4,65 @@ import google.generativeai as genai
 # Configure Gemini
 genai.configure(api_key=config.GOOGLE_API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Model with custom generation config
+model = genai.GenerativeModel(
+    "gemini-1.5-flash",
+    generation_config={
+        "temperature": 0.7,   # balanced creativity
+        "top_p": 0.9,
+    }
+)
 
-# Pro-Dev AI one-shot system prompt
+# ProDev AI one-shot system prompt
 system_prompt = (
-    "You are 🤖 ProDev AI — a professional Full Stack Coding Assistant.\n"
-    "Your job is to generate complete, runnable, and well-structured code with clear explanations.\n"
+    "🤖 You are Pro-Dev AI — a professional Full Stack Coding Assistant.\n"
+    "Your role is to generate complete, runnable, and optimized code along with concise explanations.\n"
     "Always:\n"
-    "1) Provide production-ready code (React, Node.js, Python, etc.).\n"
-    "2) Use proper formatting with Markdown code blocks.\n"
-    "3) Add concise explanations when needed (never excessive).\n"
-    "4) Ensure the code is bug-free, clean, and optimized.\n"
-    "5) Respect the tech stack requested by the user (e.g., React, TailwindCSS, Express, etc.).\n\n"
+    "1) Deliver production-ready code (React, Node.js, Python, etc.).\n"
+    "2) Format code properly using Markdown blocks.\n"
+    "3) Provide a short explanation after the code (never overly long).\n"
+    "4) Respect the requested tech stack (React, TailwindCSS, Express, etc.).\n\n"
 
-    "Here is an example:\n\n"
-
-    "Request: Build a React component with a button that fetches user data from an API and displays it.\n"
+    "Example:\n\n"
+    "User Request: Build a simple counter app in React.\n"
     "Response:\n"
     "```jsx\n"
     "import { useState } from 'react';\n\n"
-    "function UserFetcher() {\n"
-    "  const [user, setUser] = useState(null);\n\n"
-    "  const fetchUser = async () => {\n"
-    "    const res = await fetch('https://jsonplaceholder.typicode.com/users/1');\n"
-    "    const data = await res.json();\n"
-    "    setUser(data);\n"
-    "  };\n\n"
+    "function Counter() {\n"
+    "  const [count, setCount] = useState(0);\n\n"
     "  return (\n"
     "    <div className=\"p-4\">\n"
-    "      <button onClick={fetchUser} className=\"bg-blue-500 text-white px-4 py-2 rounded\">\n"
-    "        Fetch User\n"
+    "      <p className=\"text-xl\">Count: {count}</p>\n"
+    "      <button onClick={() => setCount(count + 1)} className=\"bg-blue-500 text-white px-4 py-2 rounded\">\n"
+    "        Increment\n"
     "      </button>\n"
-    "      {user && <pre className=\"mt-4\">{JSON.stringify(user, null, 2)}</pre>}\n"
     "    </div>\n"
     "  );\n"
     "}\n\n"
-    "export default UserFetcher;\n"
+    "export default Counter;\n"
     "```\n\n"
-    "Explanation: This component fetches mock user data and displays it inside a <pre> block.\n\n"
-
-    "Now, follow this exact style for any new coding request."
+    "Explanation: This React component uses `useState` to manage a counter and updates it when the button is clicked.\n\n"
+    "Follow this exact style for all future requests."
 )
 
-# Example dynamic user input (this can come from frontend, CLI, etc.)
-user_prompt = "Build me a responsive login and signup page with React and TailwindCSS."
+def ask_model(user_prompt: str):
+    # Combine system + user in one-shot
+    full_prompt = system_prompt + "\n\nUser Request: " + user_prompt
 
-# Combine system + user request (One-shot prompting)
-response = model.generate_content(system_prompt + "\n\nUser Request: " + user_prompt)
+    response = model.generate_content(full_prompt)
 
-print(response.text)
+    print("\n💻 ProDev AI Response:\n", response.text)
+
+    if hasattr(response, "usage_metadata"):
+        tokens_in = response.usage_metadata.prompt_token_count
+        tokens_out = response.usage_metadata.candidates_token_count
+        total = response.usage_metadata.total_token_count
+        print(f"\n📊 Token Usage: Input={tokens_in}, Output={tokens_out}, Total={total}\n")
+    else:
+        print("\n⚠️ Token usage metadata not available in this SDK.\n")
+
+    return response
+
+
+# Example run
+ask_model("Build me a responsive login page with React and TailwindCSS.")
