@@ -4,15 +4,22 @@ import google.generativeai as genai
 # Configure Gemini
 genai.configure(api_key=config.GOOGLE_API_KEY)
 
-# Load model
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Load model with configs
+model = genai.GenerativeModel(
+    "gemini-1.5-flash",
+    generation_config={
+        "temperature": 0.9,
+        "top_p": 0.9,
+        "top_k": 50,
+    }
+)
 
 # Pro-Dev AI system prompt
 SYSTEM_PROMPT = """
-You are Pro-Dev AI — a professional full-stack coding assistant.
-- Always return complete, runnable code.
+You are Pro-Dev AI — a professional coding assistant.
+- Always return complete, runnable code with good explaination.
+- Use clean coding practices with comments.
 - Provide a short explanation in markdown after the code.
-- Follow clean coding practices with comments.
 """
 
 def ask_model(user_prompt):
@@ -21,7 +28,6 @@ def ask_model(user_prompt):
 
     print("\n🤖 Pro-Dev AI Response:\n", response.text)
 
-    # Token usage (if available)
     if hasattr(response, "usage_metadata"):
         tokens_in = response.usage_metadata.prompt_token_count
         tokens_out = response.usage_metadata.candidates_token_count
@@ -32,5 +38,5 @@ def ask_model(user_prompt):
 
     return response
 
-# Example
-ask_model("Build a simple React counter app with TailwindCSS.")
+# Example query
+ask_model("Build a Python script that fetches weather data from an API and prints it nicely.")
