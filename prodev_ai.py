@@ -23,12 +23,13 @@ def ask_model(user_prompt):
 
     # Token usage (if available)
     if hasattr(response, "usage_metadata"):
-        tokens_in = response.usage_metadata.prompt_token_count
-        tokens_out = response.usage_metadata.candidates_token_count
-        total = response.usage_metadata.total_token_count
-        print(f"\n🔎 Token Usage: Input={tokens_in}, Output={tokens_out}, Total={total}\n")
+      tokens_in = response.usage_metadata.prompt_token_count
+      tokens_out = response.usage_metadata.candidates_token_count
+      total = response.usage_metadata.total_token_count
+      print(f"\n🔎 Token Usage: Input={tokens_in}, Output={tokens_out}, Total={total}\n")
     else:
-        print("\n Token usage metadata not available in this SDK.\n")
+      print("\n Token usage metadata not available in this SDK.\n")
+
 
     return response
 
