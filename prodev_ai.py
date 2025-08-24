@@ -7,25 +7,26 @@ genai.configure(api_key=config.GOOGLE_API_KEY)
 # Load model
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# ProDev AI user prompt
+# ProDev AI generic concept prompt
 user_prompt = """
 You are ProDev AI, a professional full-stack coding assistant.
 
-Task: Write a complete, runnable program in Python that fetches weather data from a free API
-and prints today's temperature in Celsius for a given city.
+Task: Write a complete, runnable program in Python based on the given topic.
 
-Think step by step:
-1. Choose a reliable free API (like OpenWeatherMap).
-2. Show how to make an HTTP request in Python.
-3. Parse the response JSON to extract temperature data.
-4. Handle possible errors (invalid API key, bad city name, etc).
-5. Print today's temperature in a clear format.
+Steps you must always follow:
+1. Choose appropriate libraries or APIs required.
+2. Show how to implement the program step by step.
+3. Parse/process the response or data correctly.
+4. Handle possible errors gracefully.
+5. Print or return the result in a clear format.
 
-Finally, present the output strictly in this JSON structure:
+Finally, always present the output strictly in this JSON structure:
 {
   "code": "... full Python code here ...",
   "explanation": "... short explanation of how it works ..."
 }
+
+Example topic: Fetch weather data from a free API and print today's temperature in Celsius.
 """
 
 # Start chat
