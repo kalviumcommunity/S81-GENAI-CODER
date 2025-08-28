@@ -24,19 +24,27 @@ IMPORTANT: Stop generating immediately after the JSON object.
 Do not output anything else.
 """
 
+# Function to "call" using structured output
+def process_code_response(response_text):
+    """
+    Simulates function calling: parses the JSON output and returns
+    structured data that can be directly used in your program.
+    """
+    try:
+        data = json.loads(response_text)
+        code = data.get("code", "")
+        explanation = data.get("explanation", "")
+        return code, explanation
+    except Exception as e:
+        print("⚠️ Failed to parse JSON:", e)
+        return response_text, "No structured explanation returned."
+
 def ask_model(user_prompt):
     full_prompt = SYSTEM_PROMPT + "\n\nUser Request:\n" + user_prompt
     response = model.generate_content(full_prompt)
 
-    try:
-        # Parse JSON from response
-        output = json.loads(response.text)
-        code = output.get("code", "")
-        explanation = output.get("explanation", "")
-    except Exception as e:
-        print("⚠️ Failed to parse JSON:", e)
-        code = response.text
-        explanation = "No structured explanation returned."
+    # Function-calling: parse and use the AI response
+    code, explanation = process_code_response(response.text)
 
     print("\n🟢 Code:\n", code)
     print("\n📝 Explanation:\n", explanation)
