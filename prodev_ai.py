@@ -38,7 +38,21 @@ def ask_model(user_prompt):
     print("\n🟢 Code:\n", code)
     print("\n📝 Explanation:\n", explanation)
 
-    return {"code": code, "explanation": explanation}
+    # Generate embeddings for the code + explanation
+    embedding_text = code + "\n\n" + explanation
+    embedding_response = genai.embeddings.create(
+        model="textembedding-gecko-001",
+        text=embedding_text
+    )
+    
+    embedding_vector = embedding_response.data[0].embedding
+    print("\n📌 Embedding Vector Length:", len(embedding_vector))
+
+    return {
+        "code": code,
+        "explanation": explanation,
+        "embedding": embedding_vector
+    }
 
 # Example usage
 ask_model("Build a simple React counter app with TailwindCSS.")
