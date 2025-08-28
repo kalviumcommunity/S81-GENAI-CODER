@@ -24,12 +24,8 @@ IMPORTANT: Stop generating immediately after the JSON object.
 Do not output anything else.
 """
 
-# Function to "call" using structured output
+# Function to parse AI response
 def process_code_response(response_text):
-    """
-    Simulates function calling: parses the JSON output and returns
-    structured data that can be directly used in your program.
-    """
     try:
         data = json.loads(response_text)
         code = data.get("code", "")
@@ -39,6 +35,24 @@ def process_code_response(response_text):
         print("⚠️ Failed to parse JSON:", e)
         return response_text, "No structured explanation returned."
 
+# Function to run evaluation on a single prompt
+def evaluate_prompt(user_prompt):
+    result = ask_model(user_prompt)
+    
+    # Basic testing framework: check code is non-empty and contains some keywords
+    test_passed = bool(result["code"]) and "return" in result["code"]
+    
+    evaluation_result = {
+        "prompt": user_prompt,
+        "code": result["code"],
+        "explanation": result["explanation"],
+        "embedding": result["embedding"],
+        "test_passed": test_passed
+    }
+    
+    return evaluation_result
+
+# Wrapper for generating code and embeddings
 def ask_model(user_prompt):
     full_prompt = SYSTEM_PROMPT + "\n\nUser Request:\n" + user_prompt
     response = model.generate_content(full_prompt)
@@ -65,5 +79,20 @@ def ask_model(user_prompt):
         "embedding": embedding_vector
     }
 
-# Example usage
-ask_model("Build a simple React counter app with TailwindCSS.")
+# Example evaluation dataset
+evaluation_dataset = [
+    {"description": "Simple React counter with TailwindCSS", "prompt": "Build a simple React counter app with TailwindCSS."},
+    {"description": "React button toggle component", "prompt": "Create a React button toggle component with TailwindCSS."},
+    {"description": "React input form validation", "prompt": "Create a React input form with validation using TailwindCSS."}
+]
+
+# Run evaluation
+results = []
+for item in evaluation_dataset:
+    print(f"\n=== Evaluating: {item['description']} ===")
+    eval_result = evaluate_prompt(item["prompt"])
+    results.append(eval_result)
+
+print("\n✅ Evaluation Results:")
+for r in results:
+    print(r)
