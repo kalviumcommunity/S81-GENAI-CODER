@@ -19,6 +19,9 @@ Respond ONLY in JSON with the following structure:
   "code": "Complete runnable code as string",
   "explanation": "Short explanation in markdown"
 }
+
+IMPORTANT: Stop generating immediately after the JSON object.
+Do not output anything else.
 """
 
 def ask_model(user_prompt):
